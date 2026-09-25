@@ -10,11 +10,22 @@ services:
       MYSQL_DATABASE: password_manager_db
       MYSQL_USER: pm_user
       MYSQL_PASSWORD: pm_password
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  app:
+    build: ./server 
+    container_name: pm_backend
+    restart: always
+    ports:
+      - "3000:5000"  
+    environment:
+      - DATABASE_URL=mysql+pymysql://pm_user:pm_password@db:3306/password_manager_db
+      - SECRET_KEY=super-production-secret-key
+      - JWT_SECRET_KEY=super-jwt-production-secret
+    depends_on:
+      - db
 
 volumes:
   mysql_data:
